@@ -147,3 +147,9 @@ impl Program {
         Ok(Program)
     }
 }
+
+impl Drop for Program {
+    fn drop(&mut self) {
+        gl::DeleteProgram(self.name);
+    }
+}
