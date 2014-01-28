@@ -148,6 +148,13 @@ impl Program {
             gl::BindFragDataLocation(self.name, color_number, cstr)
         });
     }
+
+    pub fn uniform(&self, name: &str) -> GLint {
+        name.with_c_str(|cstr| unsafe {
+            gl::GetUniformLocation(self.name, cstr)
+        })
+    }
+
 }
 
 /// A vertex buffer object
@@ -243,8 +250,14 @@ impl Vao {
 
     /// Draw the given primitive, using `count` vertices starting at offset
     /// `first` in the currently bound VBO.
-    pub fn draw(&self, primitive: Primitive, first: GLint, count: GLsizei) {
+    pub fn draw_array(&self, primitive: Primitive, first: GLint, count: GLsizei) {
         gl::DrawArrays(primitive.to_glenum(), first, count);
+    }
+
+    /// Draw the given primitive, using `count` vertices starting at offset
+    /// `first` in the currently bound VBO.
+    pub fn draw_elements(&self, primitive: Primitive, first: GLint, count: GLsizei) {
+        gl::DrawElements(primitive.to_glenum(), first, count);
     }
 }
 
