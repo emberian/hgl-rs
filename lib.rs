@@ -10,10 +10,16 @@
 //!
 //! hgl assumes GL 3.1 core profile with GLSL 140. It attempts to do complete
 //! error checking, and return the information the GL exposes.
+//!
+//! *NOTE*: The various `activate` methods will explicitly bind the object,
+//! but the other methods frequently bind themselves too! Be careful what you
+//! call if you expect something to be bound to stay bound. They do not
+//! restore the current binding before they return.
 
 extern mod gl;
 
-use std::unstable::intrinsics::uninit;
+use gl::types::{GLint, GLuint, GLenum, GLsizei, GLchar, GLsizeiptr};
+use std::libc::c_void;
 
 /// Shader types
 pub enum ShaderType {
@@ -23,7 +29,7 @@ pub enum ShaderType {
 
 impl ShaderType {
     /// Convert a ShaderType into its corresponding GL value
-    fn to_glenum(&self) -> gl::GLenum {
+    fn to_glenum(&self) -> GLenum {
         match *self {
             VertexShader => gl::VERTEX_SHADER,
             FragmentShader => gl::FRAGMENT_SHADER,
@@ -32,26 +38,56 @@ impl ShaderType {
 }
 
 pub struct Shader {
-    priv name: gl::GLuint,
+    priv name: GLuint,
     priv type_: ShaderType
 }
 
-impl Shader {
-    fn new(id: gl::GLuint, type_: ShaderType) -> Shader {
-        if cfg!(not(ndebug)) {
-            if gl::IsShader(id) == gl::FALSE {
-                fail!("id is not a shader!");
-            }
-        }
-        Shader::new_raw(id, type_)
+fn get_info_log(shader: GLuint, get: unsafe fn(GLuint, GLenum, *mut GLint),
+                info: unsafe fn(GLuint, GLsizei, *mut GLint, *mut GLchar),
+                status: GLenum) -> Option<~[u8]> {
+    let mut ret = gl::FALSE as GLint;
+    unsafe {
+        get(shader, status, &mut ret);
     }
 
-    fn new_raw(id: gl::GLuint, type_: ShaderType) -> Shader {
-        Shader { shader: id, type_: type_ }
+    if ret == gl::TRUE as GLint {
+        return None
+    }
+
+    let mut len = 0;
+    unsafe {
+        get(shader, gl::INFO_LOG_LENGTH, &mut len as *mut GLint);
+    }
+    if len == 0 {
+        return Some(~[]);
+    }
+
+    // len including trailing null
+    let mut s = std::vec::with_capacity(len as uint - 1);
+
+    unsafe {
+        info(shader, len, &mut len as *mut GLsizei, s.as_mut_ptr() as *mut GLchar);
+        s.set_len(len as uint - 1);
+    }
+    Some(s)
+}
+
+impl Shader {
+    pub fn from_name(name: GLuint, type_: ShaderType) -> Shader {
+        if cfg!(not(ndebug)) {
+            if gl::IsShader(name) == gl::FALSE {
+                fail!("name is not a shader!");
+            }
+        }
+        Shader::new_raw(name, type_)
+    }
+
+    fn new_raw(id: GLuint, type_: ShaderType) -> Shader {
+        Shader { name: id, type_: type_ }
     }
 
     /// Returns the name (id) of the shader.
-    pub fn name(&self) -> gl::GLuint {
+    pub fn name(&self) -> GLuint {
         self.name
     }
 
@@ -64,36 +100,15 @@ impl Shader {
         let shader = gl::CreateShader(gltype);
 
         unsafe {
-            gl::ShaderSource(shader, 1 as gl::GLsizei, &source.as_ptr() as **gl::GLchar,
-                             &source.len() as *gl::GLint);
+            gl::ShaderSource(shader, 1 as GLsizei, &(source.as_ptr() as *GLchar) as **GLchar,
+                             &(source.len() as GLint) as *GLint);
         }
+        gl::CompileShader(shader);
 
-        let mut ret = gl::FALSE;
-        // this is pretty racy if another thread is using gl
-        unsafe {
-            glGetShaderiv(shader, gl::GL_COMPILE_STATUS, &mut ret as *gl::GLint);
+        match get_info_log(shader, gl::GetShaderiv, gl::GetShaderInfoLog, gl::COMPILE_STATUS) {
+            Some(s) => Err(std::str::from_utf8_owned(s).expect("non-utf8 infolog!")),
+            None    => Ok(Shader::new_raw(shader, type_))
         }
-
-        if ret == gl::FALSE as gl::GLint {
-            // oh no, we failed!
-            let mut len: gl::GLint = uninit();
-            unsafe {
-                gl::GetShaderiv(shader, gl::GL_INFO_LOG_LENGTH, &mut len as *gl::GLint);
-            }
-
-            // len included trailing null
-            let s = std::str::with_capacity(len - 1);
-
-            // XXX: is this string utf8?
-            unsafe {
-                gl::GetShaderInfoLog(shader, len, &mut len as *gl::GLsizei,
-                                     s.as_ptr() as *gl::GLchar);
-            }
-            s.set_len(len - 1);
-            return Err(s);
-        }
-
-        Ok(Shader::new_raw(shader, type_))
     }
 }
 
@@ -105,46 +120,155 @@ impl Drop for Shader {
 
 /// A program, which consists of multiple compiled shaders "linked" together
 pub struct Program {
-    name: gl::GLuint
+    name: GLuint
 }
 
 impl Program {
     /// Link shaders into a program
     pub fn link(shaders: &[Shader]) -> Result<Program, ~str> {
         let program = gl::CreateProgram();
-        for shader in shaders {
+        for shader in shaders.iter() {
             // there are no relevant errors to handle here.
-            gl::AttachShader(program, shader.shader);
+            gl::AttachShader(program, shader.name);
         }
         gl::LinkProgram(program);
 
-        let mut ret = gl::FALSE;
-        // this is pretty racy if another thread is using gl
+        match get_info_log(program, gl::GetProgramiv, gl::GetProgramInfoLog, gl::LINK_STATUS) {
+            Some(s) => Err(std::str::from_utf8_owned(s).expect("non-utf8 infolog!")),
+            None    => Ok(Program { name: program })
+        }
+    }
+
+    pub fn activate(&self) {
+        gl::UseProgram(self.name);
+    }
+
+    pub fn bind_frag(&self, color_number: GLuint, name: &str) {
+        name.with_c_str(|cstr| unsafe {
+            gl::BindFragDataLocation(self.name, color_number, cstr)
+        });
+    }
+}
+
+/// A vertex buffer object
+pub struct Vbo {
+    name: GLuint
+}
+
+impl Drop for Vbo {
+    fn drop(&mut self) {
+        unsafe { gl::DeleteBuffers(1, &self.name); }
+    }
+}
+
+/// Frequency with which the vbo is expected to be updated
+pub enum VboUsage {
+    /// Updated once, drawn many times
+    StaticDraw,
+    /// Updated many times, drawn many times
+    DynamicDraw,
+    /// Updated once, drawn once
+    StreamDraw
+    // TODO: add Read and Copy variants
+}
+
+impl VboUsage {
+    fn to_glenum(&self) -> GLenum {
+        match *self {
+            StaticDraw  => gl::STATIC_DRAW,
+            DynamicDraw => gl::DYNAMIC_DRAW,
+            StreamDraw  => gl::STREAM_DRAW,
+        }
+    }
+}
+
+impl Vbo {
+    /// Generate a new VBO and upload `data` to it.
+    pub fn from_data<T>(data: &[T], usage: VboUsage) -> Result<Vbo, ~str> {
+        let mut vbo: GLuint = 0;
+        unsafe { gl::GenBuffers(1, &mut vbo as *mut GLuint); }
+        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
         unsafe {
-            glGetProgramiv(shader, gl::GL_COMPILE_STATUS, &mut ret as *gl::GLint);
+            info!("{} elements at {}", data.len() * std::mem::size_of::<T>(), data.as_ptr() as uint);
+            gl::BufferData(gl::ARRAY_BUFFER,
+                           (data.len() * std::mem::size_of::<T>()) as GLsizeiptr,
+                           data.as_ptr() as *c_void, usage.to_glenum());
         }
+        // TODO: check BufferData error
+        Ok(Vbo { name: vbo })
+    }
 
-        if ret == gl::FALSE as gl::GLint {
-            // oh no, we failed!
-            let mut len: gl::GLint = uninit();
+    pub fn activate(&self) {
+        gl::BindBuffer(gl::ARRAY_BUFFER, self.name);
+    }
+}
+
+/// A vertex array object
+pub struct Vao {
+    name: GLuint
+}
+
+impl Drop for Vao {
+    fn drop(&mut self) {
+        unsafe { gl::DeleteVertexArrays(1, &self.name); }
+    }
+}
+
+impl Vao {
+    pub fn new() -> Vao {
+        let mut vao: GLuint = 0;
+        unsafe { gl::GenVertexArrays(1, &mut vao as *mut GLuint); }
+        Vao { name: vao }
+    }
+
+    pub fn activate(&self) {
+        gl::BindVertexArray(self.name);
+    }
+
+    /// Define and enable an array of generic vertex attribute data for `name`
+    /// in `program`, using this VAO. TODO: Currently hardcoded to GL_FLOAT.
+    /// TODO: Normalize hardcoded to GL_FALSE.
+    pub fn enable_attrib(&self, program: &Program, name: &str, elts: GLint,
+                         stride: GLint, offset: uint) {
+        self.activate();
+        name.with_c_str(|cstr| {
             unsafe {
-                gl::GetProgramiv(shader, gl::GL_INFO_LOG_LENGTH, &mut len as *gl::GLint);
+                let pos = gl::GetAttribLocation(program.name, cstr);
+                gl::EnableVertexAttribArray(pos as GLuint);
+                gl::VertexAttribPointer(pos as GLuint, elts, gl::FLOAT,
+                                        gl::FALSE, stride, offset as *c_void);
             }
+        });
+    }
 
-            // len included trailing null
-            let s = std::str::with_capacity(len - 1);
+    /// Draw the given primitive, using `count` vertices starting at offset
+    /// `first` in the currently bound VBO.
+    pub fn draw(&self, primitive: Primitive, first: GLint, count: GLsizei) {
+        gl::DrawArrays(primitive.to_glenum(), first, count);
+    }
+}
 
-            // XXX: is this string utf8?
-            unsafe {
-                gl::GetProgramInfoLog(shader, len, &mut len as *gl::GLsizei,
-                                      s.as_ptr() as *gl::GLchar);
-            }
-            s.set_len(len - 1);
-            return Err(s);
+pub enum Primitive {
+    Points,
+    Lines,
+    LineStrip,
+    LineLoop,
+    Triangles,
+    TriangleStrip,
+    TriangleFan
+}
+
+impl Primitive {
+    fn to_glenum(&self) -> GLenum {
+        match *self {
+            Points        => gl::POINTS,
+            Lines         => gl::LINES,
+            LineStrip     => gl::LINE_STRIP,
+            LineLoop      => gl::LINE_LOOP,
+            Triangles     => gl::TRIANGLES,
+            TriangleStrip => gl::TRIANGLE_STRIP,
+            TriangleFan   => gl::TRIANGLE_FAN
         }
-
-
-        Ok(Program)
     }
 }
 
