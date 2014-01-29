@@ -257,13 +257,15 @@ impl Vao {
         gl::DrawArrays(primitive.to_glenum(), first, count);
     }
 
-    /// Draw the given primitive, using `count` vertices starting at offset
-    /// `offset` in the currently bound EBO.
+    /// Draw the given primitive, using `count` vertices from the currently
+    /// bound EBO.
     ///
     /// TODO: Hardcoded to GL_UNSIGNED_INT
-    pub fn draw_elements(&self, primitive: Primitive, count: GLint, offset: GLsizei) {
+    pub fn draw_elements(&self, primitive: Primitive, count: GLint) {
         // last argument null; use the bound buffer
-        gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, offset, std::ptr::null());
+        unsafe {
+            gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, std::ptr::null());
+        }
     }
 }
 
@@ -275,18 +277,18 @@ pub struct Ebo {
 impl Ebo {
     /// Create an EBO from a slice of indices
     pub fn from_indices(indices: &[GLuint]) -> Ebo {
-        let ebo = 0;
-        unsafe { gl::GenBuffers(1, &ebo); }
+        let mut ebo = 0;
+        unsafe { gl::GenBuffers(1, &mut ebo); }
         gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
         unsafe { gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
-                                indices.len() * std::mem::size_of::<GLuint>(),
-                                indices.len(), gl::STATIC_DRAW);
+                                (indices.len() * std::mem::size_of::<GLuint>()) as GLsizeiptr,
+                                indices.as_ptr() as *c_void, gl::STATIC_DRAW);
         }
         Ebo { name: ebo }
     }
 
     pub fn activate(&self) {
-        gl::BindBIffer(gl::ELEMENT_ARRAY_BUFFER, self.name);
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.name);
     }
 }
 

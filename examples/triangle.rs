@@ -66,7 +66,7 @@ fn main(argc: int, argv: **u8) -> int {
                 glfw::poll_events();
                 gl::ClearColor(0.0, 0.0, 0.0, 1.0);
                 gl::Clear(gl::COLOR_BUFFER_BIT);
-                vao.draw(Triangles, 0, 3);
+                vao.draw_array(Triangles, 0, 3);
                 window.swap_buffers();
             }
         });
