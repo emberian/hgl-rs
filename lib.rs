@@ -233,8 +233,11 @@ impl Vao {
     }
 
     /// Define and enable an array of generic vertex attribute data for `name`
-    /// in `program`, using this VAO. TODO: Currently hardcoded to GL_FLOAT.
-    /// TODO: Normalize hardcoded to GL_FALSE.
+    /// in `program`, in this VAO, using the bound VBO. TODO: Currently
+    /// hardcoded to GL_FLOAT.  TODO: Normalize hardcoded to GL_FALSE.
+    ///
+    /// NOTE: Memory unsafety caused when no bound VBO, or bound VBO does not
+    /// have enough data.
     pub fn enable_attrib(&self, program: &Program, name: &str, elts: GLint,
                          stride: GLint, offset: uint) {
         self.activate();
@@ -255,9 +258,35 @@ impl Vao {
     }
 
     /// Draw the given primitive, using `count` vertices starting at offset
-    /// `first` in the currently bound VBO.
-    pub fn draw_elements(&self, primitive: Primitive, first: GLint, count: GLsizei) {
-        gl::DrawElements(primitive.to_glenum(), first, count);
+    /// `offset` in the currently bound EBO.
+    ///
+    /// TODO: Hardcoded to GL_UNSIGNED_INT
+    pub fn draw_elements(&self, primitive: Primitive, count: GLint, offset: GLsizei) {
+        // last argument null; use the bound buffer
+        gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, offset, std::ptr::null());
+    }
+}
+
+/// An Element Buffer Object, aka GL_ELEMENT_ARRAY_BUFFER.
+pub struct Ebo {
+    name: GLuint
+}
+
+impl Ebo {
+    /// Create an EBO from a slice of indices
+    pub fn from_indices(indices: &[GLuint]) -> Ebo {
+        let ebo = 0;
+        unsafe { gl::GenBuffers(1, &ebo); }
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+        unsafe { gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
+                                indices.len() * std::mem::size_of::<GLuint>(),
+                                indices.len(), gl::STATIC_DRAW);
+        }
+        Ebo { name: ebo }
+    }
+
+    pub fn activate(&self) {
+        gl::BindBIffer(gl::ELEMENT_ARRAY_BUFFER, self.name);
     }
 }
 
