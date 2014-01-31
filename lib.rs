@@ -251,6 +251,14 @@ impl Vao {
         });
     }
 
+    pub fn disable_attrib(&self, program: &Program, name: &str) {
+        self.activate();
+        name.with_c_str(|cstr| {
+            let pos = unsafe { gl::GetAttribLocation(program.name, cstr) };
+            gl::DisableVertexAttribArray(pos as GLuint);
+        });
+    }
+
     /// Draw the given primitive, using `count` vertices starting at offset
     /// `first` in the currently bound VBO.
     pub fn draw_array(&self, primitive: Primitive, first: GLint, count: GLsizei) {
