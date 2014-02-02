@@ -330,13 +330,25 @@ impl Drop for Program {
     }
 }
 
+pub enum QueryTarget {
+    SamplesPassed,
+}
+
+impl QueryTarget {
+    fn to_glenum(&self) -> GLenum {
+        match *self {
+            SamplesPassed => gl::SAMPLES_PASSED,
+        }
+    }
+}
+
 pub struct Query {
     name: GLuint,
     target: GLenum,
 }
 
 impl Query {
-    pub fn new(target: GLenum) -> Query {
+    pub fn new(target: QueryTarget) -> Query {
         let mut name = 0;
 
         unsafe {
@@ -345,7 +357,7 @@ impl Query {
 
         Query {
             name: name,
-            target: target,
+            target: target.to_glenum(),
         }
     }
 
