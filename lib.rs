@@ -393,3 +393,8 @@ impl Drop for Query {
         }
     }
 }
+
+/// A simple wrapper for glPrimitiveRestartIndex.
+pub fn restart_index(index: GLuint) {
+    gl::PrimitiveRestartIndex(index);
+}
