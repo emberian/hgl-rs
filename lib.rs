@@ -16,7 +16,7 @@
 //! call if you expect something to be bound to stay bound. They do not
 //! restore the current binding before they return.
 
-extern mod gl;
+extern crate gl;
 
 use gl::types::{GLint, GLuint, GLenum, GLsizei, GLchar, GLsizeiptr};
 use std::libc::c_void;
