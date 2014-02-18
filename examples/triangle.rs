@@ -1,9 +1,8 @@
 #[no_uv];
-extern mod gl;
-extern mod hgl;
-extern mod glfw;
-extern mod extra;
-extern mod native;
+extern crate gl;
+extern crate hgl;
+extern crate native;
+extern crate glfw = "glfw-rs";
 
 use std::mem::size_of;
 
