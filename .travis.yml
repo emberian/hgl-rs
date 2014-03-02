@@ -1,0 +1,13 @@
+env:
+  global:
+    - "RUST_PATH=$HOME/.rust/lib"
+before_install:
+  - yes | sudo add-apt-repository ppa:hansjorg/rust
+  - sudo apt-get update
+install:
+  - sudo pip install cargo-lite
+script:
+  - cargo-lite install
+  - rustc examples/triangle.rs
+after_script:
+  - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh

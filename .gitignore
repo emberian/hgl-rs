@@ -1,0 +1,5 @@
+doc/
+*.rlib
+*.so
+*.swp
+*.a
