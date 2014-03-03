@@ -1,7 +1,6 @@
 env:
   global:
     - "RUST_PATH=$HOME/.rust/lib"
-    - "CARGO_DEBUG=1"
     - secure: MNwmpnZcX2uigKGqJll7L2XmZ8u/gwRJyWtCoL1uy3H3lclU9b+62RiyScYjvZ/zN1eZo2fdKwNhTLJ2qP0VX20Vgvup7kqB2cEmF6RflcuTF+kUwjvVsnzoTYKoDFkI0pZtAVCyLnDIyyjKd2SrwrErntw77z4rxwbDd54YN9U=
 before_install:
   - yes | sudo add-apt-repository ppa:hansjorg/rust
