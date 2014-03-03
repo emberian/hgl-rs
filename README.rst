@@ -1,6 +1,8 @@
 hgl-rs
 ======
 
+.. image:: https://travis-ci.org/cmr/hgl-rs.png?branch=master :target: https://travis-ci.org/cmr/hgl-rs
+
 ``hgl-rs``, short for "gl helpers for Rust", provides some boilerplate for
 working with OpenGL. I wrote it as part of my `graphics
 course`_ at Clarkson_.
