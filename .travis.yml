@@ -8,10 +8,11 @@ before_install:
 install:
   - sudo apt-get install rust-nightly
   - sudo pip install cargo-lite
+  - bash .install_glfw.sh
 script:
   - echo $RUST_PATH
   - cargo-lite install
   - cargo-lite install http://github.com/bjz/glfw-rs.git
-  - rustc  examples/triangle.rs
+  - rustc -C link-args="$(pkg-config --libs glfw3)" examples/triangle.rs
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh

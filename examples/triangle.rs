@@ -8,9 +8,6 @@ use std::mem::size_of;
 
 use hgl::{Shader, Program, Triangles, Vbo, Vao};
 
-#[link(name="glfw")]
-extern {}
-
 static VERTEX_SHADER: &'static str = "
 #version 330
 
