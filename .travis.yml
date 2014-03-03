@@ -1,6 +1,7 @@
 env:
   global:
     - "RUST_PATH=$HOME/.rust/lib"
+    - "CARGO_DEBUG=1"
 before_install:
   - yes | sudo add-apt-repository ppa:hansjorg/rust
   - sudo apt-get update
@@ -8,7 +9,8 @@ install:
   - sudo apt-get install rust-nightly
   - sudo pip install cargo-lite
 script:
+  - echo $RUST_PATH
   - cargo-lite install
-  - rustc examples/triangle.rs
+  - rustc  examples/triangle.rs
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
