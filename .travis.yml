@@ -14,6 +14,6 @@ script:
   - cargo-lite install
   - rustdoc lib.rs
   - cargo-lite install http://github.com/bjz/glfw-rs.git
-  - rustc -C link-args="$(pkg-config --libs glfw3)" examples/triangle.rs
+  - rustc -C link-args="$(pkg-config --libs glfw3)" src/examples/triangle.rs
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
