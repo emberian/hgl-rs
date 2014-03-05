@@ -26,7 +26,7 @@ pub enum VboUsage {
 }
 
 impl VboUsage {
-    fn to_glenum(&self) -> GLenum {
+    pub fn to_glenum(&self) -> GLenum {
         match *self {
             StaticDraw  => gl::STATIC_DRAW,
             DynamicDraw => gl::DYNAMIC_DRAW,

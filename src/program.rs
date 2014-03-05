@@ -12,7 +12,7 @@ pub enum ShaderType {
 
 impl ShaderType {
     /// Convert a ShaderType into its corresponding GL value
-    fn to_glenum(&self) -> GLenum {
+    pub fn to_glenum(&self) -> GLenum {
         match *self {
             VertexShader => gl::VERTEX_SHADER,
             FragmentShader => gl::FRAGMENT_SHADER,

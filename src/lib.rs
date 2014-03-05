@@ -49,7 +49,7 @@ pub enum Primitive {
 }
 
 impl Primitive {
-    fn to_glenum(&self) -> GLenum {
+    pub fn to_glenum(&self) -> GLenum {
         match *self {
             Points        => gl::POINTS,
             Lines         => gl::LINES,

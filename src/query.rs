@@ -6,7 +6,7 @@ pub enum QueryTarget {
 }
 
 impl QueryTarget {
-    fn to_glenum(&self) -> GLenum {
+    pub fn to_glenum(&self) -> GLenum {
         match *self {
             SamplesPassed => gl::SAMPLES_PASSED,
         }
