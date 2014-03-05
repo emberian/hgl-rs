@@ -23,6 +23,7 @@ pub use program::{VertexShader, FragmentShader, Shader, Program};
 pub use buffer::{Vbo, Ebo, StaticDraw};
 pub use query::Query;
 pub use vao::Vao;
+pub use texture::{ImageInfo, Texture};
 
 use gl::types::{GLuint, GLenum};
 
@@ -30,6 +31,7 @@ pub mod program;
 pub mod buffer;
 pub mod query;
 pub mod vao;
+pub mod texture;
 
 /// A simple wrapper for glPrimitiveRestartIndex.
 pub fn restart_index(index: GLuint) {
