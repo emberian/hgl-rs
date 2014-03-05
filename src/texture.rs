@@ -161,6 +161,12 @@ impl Texture {
         gl::BindTexture(self.target, self.name);
     }
 
+    pub fn wrap(&self, w: WrapMode) {
+        self.wrap_s(w);
+        self.wrap_t(w);
+        self.wrap_r(w);
+    }
+
     pub fn wrap_s(&self, w: WrapMode) {
         self.bind();
         gl::TexParameteri(self.target, gl::TEXTURE_WRAP_S, w.to_glenum() as GLint);
@@ -181,6 +187,11 @@ impl Texture {
         unsafe {
             gl::TexParameterfv(self.target, gl::TEXTURE_BORDER_COLOR, color.as_ptr());
         }
+    }
+
+    pub fn filter(&self, fm: FilterMethod) {
+        self.min_filter(fm);
+        self.mag_filter(fm);
     }
 
     pub fn min_filter(&self, fm: FilterMethod) {

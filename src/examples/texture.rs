@@ -6,27 +6,30 @@ extern crate glfw = "glfw-rs";
 
 use std::mem::size_of;
 
-use hgl::{Shader, Program, Triangles, Vbo, Vao};
+use hgl::{Shader, Program, Triangles, Vbo, Vao, Texture, ImageInfo, texture};
 
 static VERTEX_SHADER: &'static str = "
 #version 330
 
 in vec2 position;
-in vec3 color;
-out vec3 Color;
+in vec2 texcoord;
+
+out vec2 Texcoord;
 
 void main() {
     gl_Position = vec4(position, 0.0, 1.0);
     Color = color;
+    Texcoord = texcoord;
 }";
 
 static FRAGMENT_SHADER: &'static str = "
 #version 330
 out vec4 out_color;
-in vec3 Color;
+in vec2 Texcoord;
+uniform sampler2D checker;
 
 void main() {
-    out_color = vec4(Color, 1.0);
+    out_color = texture(checker, Texcoord);
 }";
 
 #[start]
@@ -49,14 +52,26 @@ fn main(argc: int, argv: **u8) -> int {
             program.bind_frag(0, "out_color");
             program.bind();
 
-            let vbo = Vbo::from_data([0.0f32,  0.5, 1.0, 0.0, 0.0,
-                                      0.5,    -0.5, 0.0, 1.0, 0.0,
-                                     -0.5,    -0.5, 0.0, 0.0, 1.0],
+            let vbo = Vbo::from_data([0.0f32,  0.5, 0.0, 0.0,
+                                      0.5,    -0.5, 1.0, 0.0,
+                                     -0.5,    -0.5, 0.5, 1.0],
                 hgl::StaticDraw).unwrap();
 
-            vao.enable_attrib(&program, "position", 2, 5*size_of::<f32>() as i32, 0);
-            vao.enable_attrib(&program, "color", 3, 5*size_of::<f32>() as i32, 2*size_of::<f32>());
+            vao.enable_attrib(&program, "position", 2, 4*size_of::<f32>() as i32, 0);
+            vao.enable_attrib(&program, "texcoord", 2, 4*size_of::<f32>() as i32, 2*size_of::<f32>());
             vbo.bind();
+
+            gl::Uniform1i(program.uniform("checker"), 0);
+
+            let tex = Texture::new(texture::Texture2D);
+            let i = ImageInfo::new().width(2).height(2).pixel_format(texture::pixel::RGB);
+            let dat = [0.0f32, 0.0, 0.0, 1.0, 1.0, 1.0,
+                       1.0,    1.0, 1.0, 0.0, 0.0, 0.0];
+            tex.load_data(i, dat.as_slice().as_ptr() as *u8);
+            tex.wrap(texture::Repeat);
+            tex.filter(texture::Linear);
+
+            tex.activate(0);
 
             while !window.should_close() {
                 glfw::poll_events();
