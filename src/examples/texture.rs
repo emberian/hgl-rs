@@ -9,7 +9,7 @@ use std::mem::size_of;
 use hgl::{Shader, Program, Triangles, Vbo, Vao, Texture, ImageInfo, texture};
 
 static VERTEX_SHADER: &'static str = "
-#version 330
+#version 140
 
 in vec2 position;
 in vec2 texcoord;
@@ -18,12 +18,11 @@ out vec2 Texcoord;
 
 void main() {
     gl_Position = vec4(position, 0.0, 1.0);
-    Color = color;
     Texcoord = texcoord;
 }";
 
 static FRAGMENT_SHADER: &'static str = "
-#version 330
+#version 140
 out vec4 out_color;
 in vec2 Texcoord;
 uniform sampler2D checker;

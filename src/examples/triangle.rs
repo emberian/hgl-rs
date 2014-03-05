@@ -9,7 +9,7 @@ use std::mem::size_of;
 use hgl::{Shader, Program, Triangles, Vbo, Vao};
 
 static VERTEX_SHADER: &'static str = "
-#version 330
+#version 140
 
 in vec2 position;
 in vec3 color;
@@ -21,7 +21,7 @@ void main() {
 }";
 
 static FRAGMENT_SHADER: &'static str = "
-#version 330
+#version 140
 out vec4 out_color;
 in vec3 Color;
 
