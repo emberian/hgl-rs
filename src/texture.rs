@@ -143,6 +143,92 @@ impl ImageInfo {
     }
 }
 
+/// SubImageInfo represents the non-data parameters to glTexSubImage*, with
+/// the goal of making the numerous arguments more readable.
+pub struct SubImageInfo {
+    level: GLint,
+    width: Option<GLsizei>,
+    height: Option<GLsizei>,
+    depth: Option<GLsizei>,
+    xoffset: Option<GLsizei>,
+    yoffset: Option<GLsizei>,
+    zoffset: Option<GLsizei>,
+    format: pixel::PixelFormat,
+    ptype: pixel::PixelType
+}
+
+impl SubImageInfo {
+    /// Create a new SubImageInfo where everything is set to a "good default",
+    /// that is, RGBA with the data type being bytes.
+    ///
+    /// Note that this struct uses the builder pattern. Its intended usage is:
+    ///
+    ///     let ii = SubImageInfo::new().width(4).xoffset(5).level(3).pixel_type(pixel::BYTE);
+    ///
+    /// This usually reads nicer. Note that since internal formats are so
+    /// numerous and complex, they do not have a typesafe wrapper. The
+    /// dimensions of the image will be inferred based on whether width etc
+    /// are called.
+    pub fn new() -> SubImageInfo {
+        SubImageInfo {
+            level: 0,
+            width: None,
+            height: None,
+            depth: None,
+            xoffset: None,
+            yoffset: None,
+            zoffset: None,
+            format: pixel::RGBA,
+            ptype: pixel::FLOAT,
+        }
+    }
+
+    /// Set the mipmap level
+    pub fn level(self, level: GLint) -> SubImageInfo {
+        SubImageInfo { level: level, ..self }
+    }
+
+    /// Set the width. 1D textures only have width.
+    pub fn width(self, s: GLint) -> SubImageInfo {
+        SubImageInfo { width: Some(s), ..self }
+    }
+
+    /// Set the height. 2D and 3D textures require this.
+    pub fn height(self, s: GLint) -> SubImageInfo {
+        SubImageInfo { height: Some(s), ..self }
+    }
+
+    /// Set the depth. Only 3D textures have depth.
+    pub fn depth(self, s: GLint) -> SubImageInfo {
+        SubImageInfo { depth: Some(s), ..self }
+    }
+
+    /// Set the X offset into the texture. 1D textures only have an X offset.
+    pub fn xoffset(self, s: GLint) -> SubImageInfo {
+        SubImageInfo { xoffset: Some(s), ..self }
+    }
+
+    /// Set the Y offset into the texture. 2D and 3D textures require this.
+    pub fn yoffset(self, s: GLint) -> SubImageInfo {
+        SubImageInfo { yoffset: Some(s), ..self }
+    }
+
+    /// Set the Z offset into the texture. Only 3D textures have a Z offset.
+    pub fn zoffset(self, s: GLint) -> SubImageInfo {
+        SubImageInfo { zoffset: Some(s), ..self }
+    }
+
+    /// Set the pixel data format
+    pub fn pixel_format(self, format: pixel::PixelFormat) -> SubImageInfo {
+        SubImageInfo { format: format, ..self }
+    }
+
+    /// Set the pixel data type
+    pub fn pixel_type(self, ptype: pixel::PixelType) -> SubImageInfo {
+        SubImageInfo { ptype: ptype, ..self }
+    }
+}
+
 /// A texture object.
 pub struct Texture {
     name: GLuint,
@@ -150,8 +236,20 @@ pub struct Texture {
 }
 
 impl Texture {
-    /// Create a new texture without binding it.
-    pub fn new(target: TextureTarget) -> Texture {
+    /// Create a new texture and load an image into it.  Note that even if
+    /// your data isn't GL_BYTE, you can pass a *u8 anyway since the GL
+    /// doesn't care about the type.
+    pub fn new(target: TextureTarget, info: ImageInfo, data: *u8) -> Texture {
+        let mut tex: GLuint = 0;
+        unsafe { gl::GenTextures(1, &mut tex as *mut GLuint); }
+        let t = Texture { name: tex, target: target.to_glenum() };
+        t.bind();
+        t.load_image(info, data);
+        t
+    }
+
+    /// Create a texture without binding it.
+    pub fn new_raw(target: TextureTarget) -> Texture {
         let mut tex: GLuint = 0;
         unsafe { gl::GenTextures(1, &mut tex as *mut GLuint); }
         Texture { name: tex, target: target.to_glenum() }
@@ -210,10 +308,8 @@ impl Texture {
         gl::GenerateMipmap(self.target);
     }
 
-    /// Load image data into this texture. Note that even if your data isn't
-    /// GL_BYTE, you can pass a *u8 anyway since the GL doesn't care about the
-    /// type.
-    pub fn load_data(&self, info: ImageInfo, data: *u8) {
+    /// Load an image into this texture.
+    pub fn load_image(&self, info: ImageInfo, data: *u8) {
         self.bind();
 
         let ImageInfo { level, internal_format, width, height, depth, format, ptype } = info;
@@ -239,6 +335,43 @@ impl Texture {
                            height.expect("3D texture needs a height!"),
                            depth.expect("3D texture needs a depth!"),
                            0, format, ptype, data as *GLvoid);
+        } }
+    }
+
+    /// Load an image into part of this texture.
+    pub fn load_subimage(&self, info: SubImageInfo, data: *u8) {
+        self.bind();
+
+        let SubImageInfo { level, width, height, depth, xoffset, yoffset, zoffset, format, ptype } = info;
+        let format = format.to_glenum();
+        let ptype = ptype.to_glenum();
+
+        if depth.is_none() && zoffset.is_none() {
+            if height.is_none() && yoffset.is_none() { unsafe {
+                // 1D
+                gl::TexSubImage1D(self.target, level,
+                                  xoffset.expect("1D texture needs an xoffset!"),
+                                  width.expect("1D texture needs a width!"),
+                                  format, ptype, data as *GLvoid);
+            } } else { unsafe {
+                // 2D
+                gl::TexSubImage2D(self.target, level,
+                                  xoffset.expect("2D texture needs an xoffset!"),
+                                  yoffset.expect("2D texture needs a yoffset!"),
+                                  width.expect("2D texture needs a width!"),
+                                  height.expect("2D texture needs a height!"),
+                                  format, ptype, data as *GLvoid);
+            } }
+        } else { unsafe {
+            // 3D
+            gl::TexSubImage3D(self.target, level,
+                              xoffset.expect("3D texture needs an xoffset!"),
+                              yoffset.expect("3D texture needs a yoffset!"),
+                              zoffset.expect("3D texture needs a zoffset!"),
+                              width.expect("3D texture needs a width!"),
+                              height.expect("3D texture needs a height!"),
+                              depth.expect("3D texture needs a height!"),
+                              format, ptype, data as *GLvoid);
         } }
     }
 
