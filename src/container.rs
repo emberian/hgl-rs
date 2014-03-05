@@ -24,7 +24,7 @@ impl Vao {
         Vao { name: vao }
     }
 
-    pub fn activate(&self) {
+    pub fn bind(&self) {
         gl::BindVertexArray(self.name);
     }
 
@@ -36,7 +36,7 @@ impl Vao {
     /// have enough data.
     pub fn enable_attrib(&self, program: &Program, name: &str, elts: GLint,
                          stride: GLint, offset: uint) {
-        self.activate();
+        self.bind();
         name.with_c_str(|cstr| {
             unsafe {
                 let pos = gl::GetAttribLocation(program.name, cstr);
@@ -48,7 +48,7 @@ impl Vao {
     }
 
     pub fn disable_attrib(&self, program: &Program, name: &str) {
-        self.activate();
+        self.bind();
         name.with_c_str(|cstr| {
             let pos = unsafe { gl::GetAttribLocation(program.name, cstr) };
             gl::DisableVertexAttribArray(pos as GLuint);

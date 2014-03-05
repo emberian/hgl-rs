@@ -51,7 +51,7 @@ impl Vbo {
         Ok(Vbo { name: vbo })
     }
 
-    pub fn activate(&self) {
+    pub fn bind(&self) {
         gl::BindBuffer(gl::ARRAY_BUFFER, self.name);
     }
 }
@@ -74,7 +74,7 @@ impl Ebo {
         Ebo { name: ebo }
     }
 
-    pub fn activate(&self) {
+    pub fn bind(&self) {
         gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.name);
     }
 }

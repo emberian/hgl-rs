@@ -122,7 +122,7 @@ impl Program {
         }
     }
 
-    pub fn activate(&self) {
+    pub fn bind(&self) {
         gl::UseProgram(self.name);
     }
 
