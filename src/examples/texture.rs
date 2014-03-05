@@ -36,8 +36,7 @@ fn main(argc: int, argv: **u8) -> int {
     native::start(argc, argv, proc() {
         glfw::set_error_callback(~glfw::LogErrorHandler);
         glfw::start(proc() {
-            glfw::window_hint::context_version(3, 3);
-            glfw::window_hint::opengl_profile(glfw::OpenGlCoreProfile);
+            glfw::window_hint::context_version(3, 1);
             let window = glfw::Window::create(800, 600, "HGL", glfw::Windowed).unwrap();
             window.make_context_current();
             gl::load_with(glfw::get_proc_address);
