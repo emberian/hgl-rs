@@ -9,27 +9,27 @@
 
 //! hgl-rs - helpers for working with OpenGL.
 //!
-//! hgl assumes GL 3.1 with GLSL 140. It attempts to do complete error
-//! checking, and return the information the GL exposes.
+//! hgl assumes GL 3.1 with GLSL 140. There are reexports for most types, but
+//! constants need to be scoped by the module name.
 //!
-//! *NOTE*: The various `activate` methods will explicitly bind the object,
+//! *NOTE*: The various `bind` methods will explicitly bind the object,
 //! but the other methods frequently bind themselves too! Be careful what you
 //! call if you expect something to be bound to stay bound. They do not
 //! restore the current binding before they return.
 
 extern crate gl;
 
-pub use program::{ShaderType, VertexShader, FragmentShader, Shader, Program};
-pub use buffer::{Vbo, Ebo, VboUsage, StaticDraw, DynamicDraw, StreamDraw};
-pub use query::{Query, QueryTarget, SamplesPassed};
-pub use container::Vao;
+pub use program::{VertexShader, FragmentShader, Shader, Program};
+pub use buffer::{Vbo, Ebo, StaticDraw};
+pub use query::Query;
+pub use vao::Vao;
 
 use gl::types::{GLuint, GLenum};
 
-mod program;
-mod buffer;
-mod query;
-mod container;
+pub mod program;
+pub mod buffer;
+pub mod query;
+pub mod vao;
 
 /// A simple wrapper for glPrimitiveRestartIndex.
 pub fn restart_index(index: GLuint) {
