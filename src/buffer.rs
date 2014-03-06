@@ -15,7 +15,7 @@ impl Drop for Vbo {
 }
 
 /// Frequency with which the vbo is expected to be updated
-pub enum VboUsage {
+pub enum BufferUsage {
     /// Updated once, drawn many times
     StaticDraw,
     /// Updated many times, drawn many times
@@ -25,7 +25,7 @@ pub enum VboUsage {
     // TODO: add Read and Copy variants
 }
 
-impl VboUsage {
+impl BufferUsage {
     pub fn to_glenum(&self) -> GLenum {
         match *self {
             StaticDraw  => gl::STATIC_DRAW,
@@ -44,15 +44,14 @@ impl Vbo {
     }
 
     /// Generate a new VBO and upload `data` to it.
-    pub fn from_data<T>(data: &[T], usage: VboUsage) -> Vbo {
+    pub fn from_data<T>(data: &[T], usage: BufferUsage) -> Vbo {
         let vbo = Vbo::new();
-        vbo.bind();
         vbo.load_data(data, usage);
         vbo
     }
 
     /// Load data into this vbo.
-    pub fn load_data<T>(&self, data: &[T], usage: VboUsage) {
+    pub fn load_data<T>(&self, data: &[T], usage: BufferUsage) {
         self.bind();
         unsafe {
             gl::BufferData(gl::ARRAY_BUFFER,
@@ -72,16 +71,28 @@ pub struct Ebo {
 }
 
 impl Ebo {
-    /// Create an EBO from a slice of indices
-    pub fn from_indices(indices: &[GLuint]) -> Ebo {
+    /// Create a new EBO, without binding it.
+    pub fn new() -> Ebo {
         let mut ebo = 0;
         unsafe { gl::GenBuffers(1, &mut ebo); }
-        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-        unsafe { gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
-                                (indices.len() * std::mem::size_of::<GLuint>()) as GLsizeiptr,
-                                indices.as_ptr() as *c_void, gl::STATIC_DRAW);
-        }
         Ebo { name: ebo }
+    }
+
+    /// Create an EBO from a slice of indices.
+    pub fn from_indices(indices: &[GLuint]) -> Ebo {
+        let ebo = Ebo::new();
+        ebo.load_data(indices, DynamicDraw);
+        ebo
+    }
+
+    /// Load new index data into this EBO.
+    pub fn load_data<T>(&self, data: &[T], usage: BufferUsage) {
+        self.bind();
+        unsafe {
+            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
+                           (data.len() * std::mem::size_of::<T>()) as GLsizeiptr,
+                           data.as_ptr() as *c_void, usage.to_glenum());
+        }
     }
 
     pub fn bind(&self) {
