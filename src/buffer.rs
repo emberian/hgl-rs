@@ -36,19 +36,29 @@ impl VboUsage {
 }
 
 impl Vbo {
-    /// Generate a new VBO and upload `data` to it.
-    pub fn from_data<T>(data: &[T], usage: VboUsage) -> Result<Vbo, ~str> {
+    /// Generate a new VBO, without binding it.
+    pub fn new() -> Vbo {
         let mut vbo: GLuint = 0;
         unsafe { gl::GenBuffers(1, &mut vbo as *mut GLuint); }
-        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+        Vbo { name: vbo }
+    }
+
+    /// Generate a new VBO and upload `data` to it.
+    pub fn from_data<T>(data: &[T], usage: VboUsage) -> Vbo {
+        let vbo = Vbo::new();
+        vbo.bind();
+        vbo.load_data(data, usage);
+        vbo
+    }
+
+    /// Load data into this vbo.
+    pub fn load_data<T>(&self, data: &[T], usage: VboUsage) {
+        self.bind();
         unsafe {
-            info!("{} elements at {}", data.len() * std::mem::size_of::<T>(), data.as_ptr() as uint);
             gl::BufferData(gl::ARRAY_BUFFER,
                            (data.len() * std::mem::size_of::<T>()) as GLsizeiptr,
                            data.as_ptr() as *c_void, usage.to_glenum());
         }
-        // TODO: check BufferData error
-        Ok(Vbo { name: vbo })
     }
 
     pub fn bind(&self) {
