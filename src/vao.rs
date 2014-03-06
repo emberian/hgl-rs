@@ -1,7 +1,6 @@
 use gl;
-use std;
 use std::libc::c_void;
-use gl::types::{GLint, GLuint, GLsizei};
+use gl::types::{GLint, GLuint, GLsizei, GLvoid};
 
 use Program;
 use Primitive;
@@ -61,14 +60,14 @@ impl Vao {
         gl::DrawArrays(primitive.to_glenum(), first, count);
     }
 
-    /// Draw the given primitive, using `count` vertices from the currently
-    /// bound EBO.
+    /// Draw the given primitive, using `count` vertices starting at offset
+    /// `first` in the currently bound EBO.
     ///
     /// TODO: Hardcoded to GL_UNSIGNED_INT
-    pub fn draw_elements(&self, primitive: Primitive, count: GLint) {
+    pub fn draw_elements(&self, primitive: Primitive, first: GLint, count: GLint) {
         // last argument null; use the bound buffer
         unsafe {
-            gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, std::ptr::null());
+            gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, first as *GLvoid);
         }
     }
 }
