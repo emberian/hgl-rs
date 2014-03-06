@@ -53,7 +53,7 @@ fn main(argc: int, argv: **u8) -> int {
             let vbo = Vbo::from_data([0.0f32,  0.5, 0.0, 0.0,
                                       0.5,    -0.5, 1.0, 0.0,
                                      -0.5,    -0.5, 0.5, 1.0],
-                hgl::StaticDraw).unwrap();
+                                     hgl::StaticDraw);
 
             vao.enable_attrib(&program, "position", 2, 4*size_of::<f32>() as i32, 0);
             vao.enable_attrib(&program, "texcoord", 2, 4*size_of::<f32>() as i32, 2*size_of::<f32>());
@@ -61,11 +61,11 @@ fn main(argc: int, argv: **u8) -> int {
 
             gl::Uniform1i(program.uniform("checker"), 0);
 
-            let tex = Texture::new(texture::Texture2D);
             let i = ImageInfo::new().width(2).height(2).pixel_format(texture::pixel::RGB);
             let dat = [0.0f32, 0.0, 0.0, 1.0, 1.0, 1.0,
                        1.0,    1.0, 1.0, 0.0, 0.0, 0.0];
-            tex.load_data(i, dat.as_slice().as_ptr() as *u8);
+
+            let tex = Texture::new(texture::Texture2D, i, dat.as_slice().as_ptr() as *u8);
             tex.wrap(texture::Repeat);
             tex.filter(texture::Linear);
 

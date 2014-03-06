@@ -51,7 +51,7 @@ fn main(argc: int, argv: **u8) -> int {
             let vbo = Vbo::from_data([0.0f32,  0.5, 1.0, 0.0, 0.0,
                                       0.5,    -0.5, 0.0, 1.0, 0.0,
                                      -0.5,    -0.5, 0.0, 0.0, 1.0],
-                hgl::StaticDraw).unwrap();
+                                     hgl::StaticDraw);
 
             vao.enable_attrib(&program, "position", 2, 5*size_of::<f32>() as i32, 0);
             vao.enable_attrib(&program, "color", 3, 5*size_of::<f32>() as i32, 2*size_of::<f32>());
