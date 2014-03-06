@@ -2,6 +2,7 @@
 
 use gl;
 use std;
+use std::io::{File, IoResult};
 use gl::types::{GLint, GLuint, GLenum, GLsizei, GLchar};
 
 /// Shader types
@@ -91,6 +92,13 @@ impl Shader {
         match get_info_log(shader, gl::GetShaderiv, gl::GetShaderInfoLog, gl::COMPILE_STATUS) {
             Some(s) => Err(std::str::from_utf8_owned(s).expect("non-utf8 infolog!")),
             None    => Ok(Shader::new_raw(shader, type_))
+        }
+    }
+
+    pub fn from_file(p: &str, type_: ShaderType) -> IoResult<Result<Shader, ~str>> {
+        match File::open(&Path::new(p)).read_to_str() {
+            Err(e) => Err(e),
+            Ok(s) => Ok(Shader::compile(s, type_))
         }
     }
 }
