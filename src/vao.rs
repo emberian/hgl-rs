@@ -1,6 +1,6 @@
 use gl;
 use std::libc::c_void;
-use gl::types::{GLint, GLuint, GLsizei, GLvoid};
+use gl::types::{GLint, GLuint, GLsizei, GLvoid, GLenum};
 
 use Program;
 use Primitive;
@@ -28,20 +28,47 @@ impl Vao {
     }
 
     /// Define and enable an array of generic vertex attribute data for `name`
-    /// in `program`, in this VAO, using the bound VBO. TODO: Currently
-    /// hardcoded to GL_FLOAT.  TODO: Normalize hardcoded to GL_FALSE.
+    /// in `program`, in this VAO, using the bound VBO.  TODO: Normalize
+    /// hardcoded to GL_FALSE.
     ///
     /// NOTE: Memory unsafety caused when no bound VBO, or bound VBO does not
     /// have enough data.
-    pub fn enable_attrib(&self, program: &Program, name: &str, elts: GLint,
-                         stride: GLint, offset: uint) {
+    pub fn enable_attrib(&self, program: &Program, name: &str, type_: GLenum,
+                         elts: GLint, stride: GLint, offset: uint) {
         self.bind();
         name.with_c_str(|cstr| {
             unsafe {
                 let pos = gl::GetAttribLocation(program.name, cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
-                gl::VertexAttribPointer(pos as GLuint, elts, gl::FLOAT,
+                gl::VertexAttribPointer(pos as GLuint, elts, type_,
                                         gl::FALSE, stride, offset as *c_void);
+            }
+        });
+    }
+
+    /// As enable_attrib, but using glVertexAttribIPointer
+    pub fn enable_int_attrib(&self, program: &Program, name: &str, type_: GLenum,
+                         elts: GLint, stride: GLint, offset: uint) {
+        self.bind();
+        name.with_c_str(|cstr| {
+            unsafe {
+                let pos = gl::GetAttribLocation(program.name, cstr);
+                gl::EnableVertexAttribArray(pos as GLuint);
+                gl::VertexAttribIPointer(pos as GLuint, elts, type_,
+                                         stride, offset as *c_void);
+            }
+        });
+    }
+
+    /// As enable_attrib, but using glVertexAttribLPointer
+    pub fn enable_double_attrib(&self, program: &Program, name: &str,
+                         elts: GLint, stride: GLint, offset: uint) {
+        self.bind();
+        name.with_c_str(|cstr| {
+            unsafe {
+                let pos = gl::GetAttribLocation(program.name, cstr);
+                gl::EnableVertexAttribArray(pos as GLuint);
+                gl::VertexAttribLPointer(pos as GLuint, elts, gl::DOUBLE, stride, offset as *c_void);
             }
         });
     }
