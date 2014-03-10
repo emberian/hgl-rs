@@ -245,6 +245,7 @@ impl Texture {
         let t = Texture { name: tex, target: target.to_glenum() };
         t.bind();
         t.load_image(info, data);
+        t.gen_mipmaps();
         t
     }
 

@@ -34,7 +34,8 @@ fn main(argc: int, argv: **u8) -> int {
     native::start(argc, argv, proc() {
         glfw::set_error_callback(~glfw::LogErrorHandler);
         glfw::start(proc() {
-            glfw::window_hint::context_version(3, 1);
+            glfw::window_hint::context_version(3, 2);
+            glfw::window_hint::opengl_profile(glfw::OpenGlCoreProfile);
             let window = glfw::Window::create(800, 600, "HGL", glfw::Windowed).unwrap();
             window.make_context_current();
             gl::load_with(glfw::get_proc_address);
@@ -53,8 +54,8 @@ fn main(argc: int, argv: **u8) -> int {
                                      -0.5,    -0.5, 0.0, 0.0, 1.0],
                                      hgl::StaticDraw);
 
-            vao.enable_attrib(&program, "position", 2, 5*size_of::<f32>() as i32, 0);
-            vao.enable_attrib(&program, "color", 3, 5*size_of::<f32>() as i32, 2*size_of::<f32>());
+            vao.enable_attrib(&program, "position", gl::FLOAT, 2, 5*size_of::<f32>() as i32, 0);
+            vao.enable_attrib(&program, "color", gl::FLOAT, 3, 5*size_of::<f32>() as i32, 2*size_of::<f32>());
             vbo.bind();
 
             while !window.should_close() {
