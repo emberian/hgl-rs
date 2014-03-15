@@ -3,6 +3,7 @@
 use gl;
 use std;
 use std::io::{File, IoResult};
+use std::vec_ng::Vec;
 use gl::types::{GLint, GLuint, GLenum, GLsizei, GLchar};
 
 /// Shader types
@@ -28,7 +29,7 @@ pub struct Shader {
 
 fn get_info_log(shader: GLuint, get: unsafe fn(GLuint, GLenum, *mut GLint),
                 info: unsafe fn(GLuint, GLsizei, *mut GLint, *mut GLchar),
-                status: GLenum) -> Option<~[u8]> {
+                status: GLenum) -> Option<Vec<u8>> {
     let mut ret = gl::FALSE as GLint;
     unsafe {
         get(shader, status, &mut ret);
@@ -43,14 +44,14 @@ fn get_info_log(shader: GLuint, get: unsafe fn(GLuint, GLenum, *mut GLint),
         get(shader, gl::INFO_LOG_LENGTH, &mut len as *mut GLint);
     }
     if len == 0 {
-        return Some(~[]);
+        return Some(Vec::new());
     }
 
     // len including trailing null
-    let mut s = std::vec::with_capacity(len as uint - 1);
+    let mut s = Vec::with_capacity(len as uint - 1);
 
     unsafe {
-        info(shader, len, &mut len as *mut GLsizei, s.as_mut_ptr() as *mut GLchar);
+        info(shader, len, &mut len as *mut GLsizei, s.as_mut_slice().as_mut_ptr() as *mut GLchar);
         s.set_len(len as uint - 1);
     }
     Some(s)
@@ -79,6 +80,7 @@ impl Shader {
     ///
     /// Takes the shader contents as a string. On success the Shader is returned.
     /// On failure, the complete log from glGetShaderInfoLog is returned.
+    #[allow(deprecated_owned_vector)]
     pub fn compile(source: &str, type_: ShaderType) -> Result<Shader, ~str> {
         let gltype = type_.to_glenum();
         let shader = gl::CreateShader(gltype);
@@ -90,7 +92,7 @@ impl Shader {
         gl::CompileShader(shader);
 
         match get_info_log(shader, gl::GetShaderiv, gl::GetShaderInfoLog, gl::COMPILE_STATUS) {
-            Some(s) => Err(std::str::from_utf8_owned(s).expect("non-utf8 infolog!")),
+            Some(s) => Err(std::str::from_utf8_owned(s.move_iter().collect::<~[u8]>()).expect("non-utf8 infolog!")),
             None    => Ok(Shader::new_raw(shader, type_))
         }
     }
@@ -116,6 +118,7 @@ pub struct Program {
 
 impl Program {
     /// Link shaders into a program
+    #[allow(deprecated_owned_vector)]
     pub fn link(shaders: &[Shader]) -> Result<Program, ~str> {
         let program = gl::CreateProgram();
         for shader in shaders.iter() {
@@ -125,7 +128,7 @@ impl Program {
         gl::LinkProgram(program);
 
         match get_info_log(program, gl::GetProgramiv, gl::GetProgramInfoLog, gl::LINK_STATUS) {
-            Some(s) => Err(std::str::from_utf8_owned(s).expect("non-utf8 infolog!")),
+            Some(s) => Err(std::str::from_utf8_owned(s.move_iter().collect::<~[u8]>()).expect("non-utf8 infolog!")),
             None    => Ok(Program { name: program })
         }
     }
