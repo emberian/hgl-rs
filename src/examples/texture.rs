@@ -1,8 +1,8 @@
 #[no_uv];
 extern crate gl;
 extern crate hgl;
+extern crate glfw;
 extern crate native;
-extern crate glfw = "glfw-rs";
 
 use std::mem::size_of;
 
