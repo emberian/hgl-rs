@@ -3,7 +3,7 @@
 use gl;
 use std;
 use std::io::{File, IoResult};
-use std::vec_ng::Vec;
+use std::vec::Vec;
 use gl::types::{GLint, GLuint, GLenum, GLsizei, GLchar};
 
 /// Shader types
