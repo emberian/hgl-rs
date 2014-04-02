@@ -23,8 +23,8 @@ impl ShaderType {
 }
 
 pub struct Shader {
-    priv name: GLuint,
-    priv type_: ShaderType
+    name: GLuint,
+    type_: ShaderType
 }
 
 fn get_info_log(shader: GLuint, get: unsafe fn(GLuint, GLenum, *mut GLint),

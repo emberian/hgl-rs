@@ -1,11 +1,11 @@
-#[crate_type = "rlib"];
-#[crate_type = "lib"];
+#![crate_type = "rlib"]
+#![crate_type = "lib"]
 
-#[crate_id = "github.com/cmr/hgl-rs#hgl:0.0.1"];
-#[deny(warnings)];
+#![crate_id = "github.com/cmr/hgl-rs#hgl:0.0.1"]
+#![deny(warnings)]
 
-#[license = "ASL2/MIT"];
-#[comment = "Helper utilities for working with OpenGL"];
+#![license = "ASL2/MIT"]
+#![comment = "Helper utilities for working with OpenGL"]
 
 //! hgl-rs - helpers for working with OpenGL.
 //!
@@ -16,6 +16,7 @@
 //! but the other methods frequently bind themselves too! Be careful what you
 //! call if you expect something to be bound to stay bound. They do not
 //! restore the current binding before they return.
+
 
 extern crate gl;
 
