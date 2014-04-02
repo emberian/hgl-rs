@@ -1,5 +1,5 @@
 //! Enums for pixel format and pixel types, for pixel transfers (particularly in textures).
-#[allow(non_camel_case_types)];
+#![allow(non_camel_case_types)]
 
 use gl;
 use gl::types::GLenum;
