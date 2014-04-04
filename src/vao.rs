@@ -76,7 +76,7 @@ impl Vao {
     pub fn disable_attrib(&self, program: &Program, name: &str) {
         self.bind();
         name.with_c_str(|cstr| {
-            let pos = unsafe { gl::GetAttribLocation(program.name, cstr) };
+            let pos = unsafe { gl::GetAttribLocation(program.get_name(), cstr) };
             gl::DisableVertexAttribArray(pos as GLuint);
         });
     }
