@@ -149,6 +149,7 @@ impl Program {
         })
     }
 
+    pub fn get_name(&self) -> GLuint { self.name }
 }
 
 impl Drop for Program {

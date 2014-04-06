@@ -38,7 +38,7 @@ impl Vao {
         self.bind();
         name.with_c_str(|cstr| {
             unsafe {
-                let pos = gl::GetAttribLocation(program.name, cstr);
+                let pos = gl::GetAttribLocation(program.get_name(), cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
                 gl::VertexAttribPointer(pos as GLuint, elts, type_,
                                         gl::FALSE, stride, offset as *c_void);
@@ -52,7 +52,7 @@ impl Vao {
         self.bind();
         name.with_c_str(|cstr| {
             unsafe {
-                let pos = gl::GetAttribLocation(program.name, cstr);
+                let pos = gl::GetAttribLocation(program.get_name(), cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
                 gl::VertexAttribIPointer(pos as GLuint, elts, type_,
                                          stride, offset as *c_void);
@@ -66,7 +66,7 @@ impl Vao {
         self.bind();
         name.with_c_str(|cstr| {
             unsafe {
-                let pos = gl::GetAttribLocation(program.name, cstr);
+                let pos = gl::GetAttribLocation(program.get_name(), cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
                 gl::VertexAttribLPointer(pos as GLuint, elts, gl::DOUBLE, stride, offset as *c_void);
             }
@@ -76,7 +76,7 @@ impl Vao {
     pub fn disable_attrib(&self, program: &Program, name: &str) {
         self.bind();
         name.with_c_str(|cstr| {
-            let pos = unsafe { gl::GetAttribLocation(program.name, cstr) };
+            let pos = unsafe { gl::GetAttribLocation(program.get_name(), cstr) };
             gl::DisableVertexAttribArray(pos as GLuint);
         });
     }
