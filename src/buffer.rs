@@ -1,6 +1,6 @@
 use gl;
 use std;
-use std::libc::c_void;
+use libc::c_void;
 use gl::types::{GLuint, GLenum, GLsizeiptr};
 
 /// A vertex buffer object

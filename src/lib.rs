@@ -19,6 +19,7 @@
 
 
 extern crate gl;
+extern crate libc;
 
 pub use program::{VertexShader, FragmentShader, Shader, Program};
 pub use buffer::{Vbo, Ebo, StaticDraw};

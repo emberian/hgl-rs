@@ -4,6 +4,7 @@ extern crate glfw;
 extern crate native;
 extern crate hgl;
 extern crate gl;
+extern crate libc;
 
 use std::mem::size_of;
 

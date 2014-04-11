@@ -1,5 +1,5 @@
 use gl;
-use std::libc::c_void;
+use libc::c_void;
 use gl::types::{GLint, GLuint, GLsizei, GLvoid, GLenum};
 
 use Program;
