@@ -14,8 +14,8 @@ impl QueryTarget {
 }
 
 pub struct Query {
-    name: GLuint,
-    target: GLenum,
+    pub name: GLuint,
+    pub target: GLenum,
 }
 
 impl Query {
