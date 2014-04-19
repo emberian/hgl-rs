@@ -23,8 +23,8 @@ impl ShaderType {
 }
 
 pub struct Shader {
-    name: GLuint,
-    type_: ShaderType
+    pub name: GLuint,
+    pub type_: ShaderType
 }
 
 fn get_info_log(shader: GLuint, get: unsafe fn(GLuint, GLenum, *mut GLint),
@@ -113,7 +113,7 @@ impl Drop for Shader {
 
 /// A program, which consists of multiple compiled shaders "linked" together
 pub struct Program {
-    name: GLuint
+    pub name: GLuint
 }
 
 impl Program {

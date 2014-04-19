@@ -7,7 +7,7 @@ use Primitive;
 
 /// A vertex array object
 pub struct Vao {
-    name: GLuint
+    pub name: GLuint
 }
 
 impl Drop for Vao {

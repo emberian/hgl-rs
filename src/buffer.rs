@@ -5,7 +5,7 @@ use gl::types::{GLuint, GLenum, GLsizeiptr};
 
 /// A vertex buffer object
 pub struct Vbo {
-    name: GLuint
+    pub name: GLuint
 }
 
 impl Drop for Vbo {
@@ -67,7 +67,7 @@ impl Vbo {
 
 /// An Element Buffer Object, aka GL_ELEMENT_ARRAY_BUFFER.
 pub struct Ebo {
-    name: GLuint
+    pub name: GLuint
 }
 
 impl Ebo {

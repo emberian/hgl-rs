@@ -74,13 +74,13 @@ impl FilterMethod {
 /// ImageInfo represents the non-data parameters to glTexImage*, with the goal
 /// of making the numerous arguments more readable.
 pub struct ImageInfo {
-    level: GLint,
-    internal_format: GLint,
-    width: Option<GLsizei>,
-    height: Option<GLsizei>,
-    depth: Option<GLsizei>,
-    format: pixel::PixelFormat,
-    ptype: pixel::PixelType
+    pub level: GLint,
+    pub internal_format: GLint,
+    pub width: Option<GLsizei>,
+    pub height: Option<GLsizei>,
+    pub depth: Option<GLsizei>,
+    pub format: pixel::PixelFormat,
+    pub ptype: pixel::PixelType
 }
 
 impl ImageInfo {
@@ -231,8 +231,8 @@ impl SubImageInfo {
 
 /// A texture object.
 pub struct Texture {
-    name: GLuint,
-    target: GLenum,
+    pub name: GLuint,
+    pub target: GLenum,
 }
 
 impl Texture {
