@@ -35,10 +35,12 @@ void main() {
 #[start]
 fn main(argc: int, argv: **u8) -> int {
     native::start(argc, argv, proc() {
-        let (glfw, errors) = glfw::init().unwrap();
-        glfw::fail_on_error(&errors);
+        let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+
         glfw.window_hint(glfw::ContextVersion(3, 1));
+
         let (window, _events) = glfw.create_window(800, 600, "HGL", glfw::Windowed).unwrap();
+
         window.make_current();
         gl::load_with(|p| glfw.get_proc_address(p));
 
