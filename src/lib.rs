@@ -22,7 +22,7 @@ extern crate gl;
 extern crate libc;
 
 pub use program::{VertexShader, FragmentShader, Shader, Program};
-pub use buffer::{Vbo, Ebo, StaticDraw};
+pub use buffer::{Vbo, Ibo, StaticDraw};
 pub use query::Query;
 pub use vao::Vao;
 pub use texture::{ImageInfo, Texture};

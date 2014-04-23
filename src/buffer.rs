@@ -66,21 +66,21 @@ impl Vbo {
 }
 
 /// An Element Buffer Object, aka GL_ELEMENT_ARRAY_BUFFER.
-pub struct Ebo {
+pub struct Ibo {
     pub name: GLuint
 }
 
-impl Ebo {
+impl Ibo {
     /// Create a new EBO, without binding it.
-    pub fn new() -> Ebo {
+    pub fn new() -> Ibo {
         let mut ebo = 0;
         unsafe { gl::GenBuffers(1, &mut ebo); }
-        Ebo { name: ebo }
+        Ibo { name: ebo }
     }
 
     /// Create an EBO from a slice of indices.
-    pub fn from_indices(indices: &[GLuint]) -> Ebo {
-        let ebo = Ebo::new();
+    pub fn from_indices(indices: &[GLuint]) -> Ibo {
+        let ebo = Ibo::new();
         ebo.load_data(indices, DynamicDraw);
         ebo
     }
