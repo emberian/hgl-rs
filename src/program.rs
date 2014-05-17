@@ -1,9 +1,7 @@
 //! Dealing with Programs and Shaders
 
 use gl;
-use std;
 use std::io::{File, IoResult};
-use std::vec::Vec;
 use gl::types::{GLint, GLuint, GLenum, GLsizei, GLchar};
 
 /// Shader types
@@ -81,7 +79,7 @@ impl Shader {
     /// Takes the shader contents as a string. On success the Shader is returned.
     /// On failure, the complete log from glGetShaderInfoLog is returned.
     #[allow(deprecated_owned_vector)]
-    pub fn compile(source: &str, type_: ShaderType) -> Result<Shader, ~str> {
+    pub fn compile(source: &str, type_: ShaderType) -> Result<Shader, StrBuf> {
         let gltype = type_.to_glenum();
         let shader = gl::CreateShader(gltype);
 
@@ -92,12 +90,12 @@ impl Shader {
         gl::CompileShader(shader);
 
         match get_info_log(shader, gl::GetShaderiv, gl::GetShaderInfoLog, gl::COMPILE_STATUS) {
-            Some(s) => Err(std::str::from_utf8_owned(s.move_iter().collect::<~[u8]>()).expect("non-utf8 infolog!")),
+            Some(s) => Err(StrBuf::from_utf8(s).ok().expect("non-utf8 infolog!")),
             None    => Ok(Shader::new_raw(shader, type_))
         }
     }
 
-    pub fn from_file(p: &str, type_: ShaderType) -> IoResult<Result<Shader, ~str>> {
+    pub fn from_file(p: &str, type_: ShaderType) -> IoResult<Result<Shader, StrBuf>> {
         match File::open(&Path::new(p)).read_to_str() {
             Err(e) => Err(e),
             Ok(s) => Ok(Shader::compile(s, type_))
@@ -119,7 +117,7 @@ pub struct Program {
 impl Program {
     /// Link shaders into a program
     #[allow(deprecated_owned_vector)]
-    pub fn link(shaders: &[Shader]) -> Result<Program, ~str> {
+    pub fn link(shaders: &[Shader]) -> Result<Program, StrBuf> {
         let program = gl::CreateProgram();
         for shader in shaders.iter() {
             // there are no relevant errors to handle here.
@@ -128,7 +126,7 @@ impl Program {
         gl::LinkProgram(program);
 
         match get_info_log(program, gl::GetProgramiv, gl::GetProgramInfoLog, gl::LINK_STATUS) {
-            Some(s) => Err(std::str::from_utf8_owned(s.move_iter().collect::<~[u8]>()).expect("non-utf8 infolog!")),
+            Some(s) => Err(StrBuf::from_utf8(s).ok().expect("non-utf8 infolog!")),
             None    => Ok(Program { name: program })
         }
     }
