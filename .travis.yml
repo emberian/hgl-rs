@@ -1,14 +1,14 @@
+language: c
+install:
+  - curl -O http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - tar xfz rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+  - (cd rust-nightly-x86_64-unknown-linux-gnu/ && sudo ./install.sh)
+  - sudo pip install cargo-lite
+  - bash .install_glfw.sh
 env:
   global:
     - "RUST_PATH=$HOME/.rust/lib"
     - secure: MNwmpnZcX2uigKGqJll7L2XmZ8u/gwRJyWtCoL1uy3H3lclU9b+62RiyScYjvZ/zN1eZo2fdKwNhTLJ2qP0VX20Vgvup7kqB2cEmF6RflcuTF+kUwjvVsnzoTYKoDFkI0pZtAVCyLnDIyyjKd2SrwrErntw77z4rxwbDd54YN9U=
-before_install:
-  - yes | sudo add-apt-repository ppa:hansjorg/rust
-  - sudo apt-get update
-install:
-  - sudo apt-get install rust-nightly
-  - sudo pip install cargo-lite
-  - bash .install_glfw.sh
 script:
   - echo $RUST_PATH
   - cargo-lite install
