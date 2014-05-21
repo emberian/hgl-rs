@@ -1,6 +1,7 @@
 use gl;
 use gl::types::{GLuint, GLenum, GLsizei, GLfloat, GLvoid, GLint};
 
+#[path="pixel.rs"]
 pub mod pixel;
 
 pub enum TextureTarget {
