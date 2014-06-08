@@ -3,6 +3,7 @@
 
 #![crate_id = "github.com/cmr/hgl-rs#hgl:0.0.1"]
 #![deny(warnings)]
+#![allow(unused_attribute)]
 
 #![license = "ASL2/MIT"]
 #![comment = "Helper utilities for working with OpenGL"]
