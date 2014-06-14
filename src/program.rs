@@ -78,7 +78,6 @@ impl Shader {
     ///
     /// Takes the shader contents as a string. On success the Shader is returned.
     /// On failure, the complete log from glGetShaderInfoLog is returned.
-    #[allow(deprecated_owned_vector)]
     pub fn compile(source: &str, type_: ShaderType) -> Result<Shader, String> {
         let gltype = type_.to_glenum();
         let shader = gl::CreateShader(gltype);
@@ -116,7 +115,6 @@ pub struct Program {
 
 impl Program {
     /// Link shaders into a program
-    #[allow(deprecated_owned_vector)]
     pub fn link(shaders: &[Shader]) -> Result<Program, String> {
         let program = gl::CreateProgram();
         for shader in shaders.iter() {
