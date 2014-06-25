@@ -1,0 +1,15 @@
+[package]
+
+name = "hgl-rs"
+version = "0.0.1"
+authors = ["Corey Richardson"]
+
+[[lib]]
+
+name = "hgl"
+path = "src/lib.rs"
+
+[dependencies.gl-rs]
+
+git = "https://github.com/bjz/gl-rs.git"
+
