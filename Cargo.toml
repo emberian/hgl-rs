@@ -9,7 +9,7 @@ authors = ["Corey Richardson"]
 name = "hgl"
 path = "src/lib.rs"
 
-[dependencies.gl-rs]
+[dependencies.gl]
 
 git = "https://github.com/bjz/gl-rs.git"
 
