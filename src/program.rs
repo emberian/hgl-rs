@@ -115,11 +115,16 @@ pub struct Program {
 
 impl Program {
     /// Link shaders into a program
-    pub fn link(shaders: &[Shader]) -> Result<Program, String> {
+    pub fn link(shaders: &[Result<Shader, String>]) -> Result<Program, String> {
         let program = gl::CreateProgram();
         for shader in shaders.iter() {
-            // there are no relevant errors to handle here.
-            gl::AttachShader(program, shader.name);
+            match shader {
+                &Ok(ref shader) => {
+                    // there are no relevant errors to handle here.
+                    gl::AttachShader(program, shader.name);
+                },
+                &Err(ref e) => return Err(e.clone())
+            }
         }
         gl::LinkProgram(program);
 

@@ -48,8 +48,8 @@ fn main(argc: int, argv: **u8) -> int {
 
         let vao = Vao::new();
         vao.bind();
-        let program = Program::link([Shader::compile(VERTEX_SHADER, hgl::VertexShader).ok().unwrap(),
-        Shader::compile(FRAGMENT_SHADER, hgl::FragmentShader).ok().unwrap()]).unwrap();
+        let program = Program::link([Shader::compile(VERTEX_SHADER, hgl::VertexShader),
+                                     Shader::compile(FRAGMENT_SHADER, hgl::FragmentShader)]).unwrap();
         program.bind_frag(0, "out_color");
         program.bind();
 
