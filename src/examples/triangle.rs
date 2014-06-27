@@ -58,8 +58,8 @@ fn main(argc: int, argv: **u8) -> int {
         -0.5,    -0.5, 0.0, 0.0, 1.0],
         hgl::StaticDraw);
 
-        vao.enable_attrib(program, "position", gl::FLOAT, 2, 5*size_of::<f32>() as i32, 0);
-        vao.enable_attrib(program, "color", gl::FLOAT, 3, 5*size_of::<f32>() as i32, 2*size_of::<f32>());
+        vao.enable_attrib(&program, "position", gl::FLOAT, 2, 5*size_of::<f32>() as i32, 0);
+        vao.enable_attrib(&program, "color", gl::FLOAT, 3, 5*size_of::<f32>() as i32, 2*size_of::<f32>());
         vbo.bind();
 
         while !window.should_close() {

@@ -58,8 +58,8 @@ fn main(argc: int, argv: **u8) -> int {
         -0.5,    -0.5, 0.5, 1.0],
         hgl::StaticDraw);
 
-        vao.enable_attrib(program, "position", gl::FLOAT, 2, 4*size_of::<f32>() as i32, 0);
-        vao.enable_attrib(program, "texcoord", gl::FLOAT, 2, 4*size_of::<f32>() as i32, 2*size_of::<f32>());
+        vao.enable_attrib(&program, "position", gl::FLOAT, 2, 4*size_of::<f32>() as i32, 0);
+        vao.enable_attrib(&program, "texcoord", gl::FLOAT, 2, 4*size_of::<f32>() as i32, 2*size_of::<f32>());
         vbo.bind();
 
         gl::Uniform1i(program.uniform("checker"), 0);

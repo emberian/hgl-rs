@@ -33,7 +33,7 @@ impl Vao {
     ///
     /// NOTE: Memory unsafety caused when no bound VBO, or bound VBO does not
     /// have enough data.
-    pub fn enable_attrib(&self, program: Program, name: &str, type_: GLenum,
+    pub fn enable_attrib(&self, program: &Program, name: &str, type_: GLenum,
                          elts: GLint, stride: GLint, offset: uint) {
         self.bind();
         name.with_c_str(|cstr| {
@@ -47,7 +47,7 @@ impl Vao {
     }
 
     /// As enable_attrib, but using glVertexAttribIPointer
-    pub fn enable_int_attrib(&self, program: Program, name: &str, type_: GLenum,
+    pub fn enable_int_attrib(&self, program: &Program, name: &str, type_: GLenum,
                          elts: GLint, stride: GLint, offset: uint) {
         self.bind();
         name.with_c_str(|cstr| {
@@ -61,7 +61,7 @@ impl Vao {
     }
 
     /// As enable_attrib, but using glVertexAttribLPointer
-    pub fn enable_double_attrib(&self, program: Program, name: &str,
+    pub fn enable_double_attrib(&self, program: &Program, name: &str,
                          elts: GLint, stride: GLint, offset: uint) {
         self.bind();
         name.with_c_str(|cstr| {
@@ -73,7 +73,7 @@ impl Vao {
         });
     }
 
-    pub fn disable_attrib(&self, program: Program, name: &str) {
+    pub fn disable_attrib(&self, program: &Program, name: &str) {
         self.bind();
         name.with_c_str(|cstr| {
             let pos = unsafe { gl::GetAttribLocation(program.get_name(), cstr) };
