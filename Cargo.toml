@@ -11,5 +11,4 @@ path = "src/lib.rs"
 
 [dependencies.gl]
 
-git = "https://github.com/bjz/gl-rs.git"
-
+git = "https://github.com/bjz/gl-rs"
