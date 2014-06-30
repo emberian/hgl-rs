@@ -56,7 +56,7 @@ impl Vbo {
         unsafe {
             gl::BufferData(gl::ARRAY_BUFFER,
                            (data.len() * std::mem::size_of::<T>()) as GLsizeiptr,
-                           data.as_ptr() as *c_void, usage.to_glenum());
+                           data.as_ptr() as *const c_void, usage.to_glenum());
         }
     }
 
@@ -91,7 +91,7 @@ impl Ebo {
         unsafe {
             gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
                            (data.len() * std::mem::size_of::<T>()) as GLsizeiptr,
-                           data.as_ptr() as *c_void, usage.to_glenum());
+                           data.as_ptr() as *const c_void, usage.to_glenum());
         }
     }
 
