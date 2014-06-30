@@ -41,7 +41,7 @@ impl Vao {
                 let pos = gl::GetAttribLocation(program.get_name(), cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
                 gl::VertexAttribPointer(pos as GLuint, elts, type_,
-                                        gl::FALSE, stride, offset as *c_void);
+                                        gl::FALSE, stride, offset as *const c_void);
             }
         });
     }
@@ -55,7 +55,7 @@ impl Vao {
                 let pos = gl::GetAttribLocation(program.get_name(), cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
                 gl::VertexAttribIPointer(pos as GLuint, elts, type_,
-                                         stride, offset as *c_void);
+                                         stride, offset as *const c_void);
             }
         });
     }
@@ -68,7 +68,7 @@ impl Vao {
             unsafe {
                 let pos = gl::GetAttribLocation(program.get_name(), cstr);
                 gl::EnableVertexAttribArray(pos as GLuint);
-                gl::VertexAttribLPointer(pos as GLuint, elts, gl::DOUBLE, stride, offset as *c_void);
+                gl::VertexAttribLPointer(pos as GLuint, elts, gl::DOUBLE, stride, offset as *const c_void);
             }
         });
     }
@@ -94,7 +94,7 @@ impl Vao {
     pub fn draw_elements(&self, primitive: Primitive, first: GLint, count: GLint) {
         // last argument null; use the bound buffer
         unsafe {
-            gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, first as *GLvoid);
+            gl::DrawElements(primitive.to_glenum(), count, gl::UNSIGNED_INT, first as *const GLvoid);
         }
     }
 }

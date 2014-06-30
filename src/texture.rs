@@ -240,7 +240,7 @@ impl Texture {
     /// Create a new texture and load an image into it.  Note that even if
     /// your data isn't GL_BYTE, you can pass a *u8 anyway since the GL
     /// doesn't care about the type.
-    pub fn new(target: TextureTarget, info: ImageInfo, data: *u8) -> Texture {
+    pub fn new(target: TextureTarget, info: ImageInfo, data: *const u8) -> Texture {
         let mut tex: GLuint = 0;
         unsafe { gl::GenTextures(1, &mut tex as *mut GLuint); }
         let t = Texture { name: tex, target: target.to_glenum() };
@@ -311,7 +311,7 @@ impl Texture {
     }
 
     /// Load an image into this texture.
-    pub fn load_image(&self, info: ImageInfo, data: *u8) {
+    pub fn load_image(&self, info: ImageInfo, data: *const u8) {
         self.bind();
 
         let ImageInfo { level, internal_format, width, height, depth, format, ptype } = info;
@@ -322,13 +322,13 @@ impl Texture {
                 // 1D
                 gl::TexImage1D(self.target, level, internal_format,
                                width.expect("1D texture needs a width!"),
-                               0, format, ptype, data as *GLvoid);
+                               0, format, ptype, data as *const GLvoid);
             } } else { unsafe {
                 // 2D
                 gl::TexImage2D(self.target, level, internal_format,
                                width.expect("2D texture needs a width!"),
                                height.expect("2D texture needs a height!"),
-                               0, format, ptype, data as *GLvoid);
+                               0, format, ptype, data as *const GLvoid);
             } }
         } else { unsafe {
             // 3D
@@ -336,12 +336,12 @@ impl Texture {
                            width.expect("3D texture needs a width!"),
                            height.expect("3D texture needs a height!"),
                            depth.expect("3D texture needs a depth!"),
-                           0, format, ptype, data as *GLvoid);
+                           0, format, ptype, data as *const GLvoid);
         } }
     }
 
     /// Load an image into part of this texture.
-    pub fn load_subimage(&self, info: SubImageInfo, data: *u8) {
+    pub fn load_subimage(&self, info: SubImageInfo, data: *const u8) {
         self.bind();
 
         let SubImageInfo { level, width, height, depth, xoffset, yoffset, zoffset, format, ptype } = info;
@@ -354,7 +354,7 @@ impl Texture {
                 gl::TexSubImage1D(self.target, level,
                                   xoffset.expect("1D texture needs an xoffset!"),
                                   width.expect("1D texture needs a width!"),
-                                  format, ptype, data as *GLvoid);
+                                  format, ptype, data as *const GLvoid);
             } } else { unsafe {
                 // 2D
                 gl::TexSubImage2D(self.target, level,
@@ -362,7 +362,7 @@ impl Texture {
                                   yoffset.expect("2D texture needs a yoffset!"),
                                   width.expect("2D texture needs a width!"),
                                   height.expect("2D texture needs a height!"),
-                                  format, ptype, data as *GLvoid);
+                                  format, ptype, data as *const GLvoid);
             } }
         } else { unsafe {
             // 3D
@@ -373,7 +373,7 @@ impl Texture {
                               width.expect("3D texture needs a width!"),
                               height.expect("3D texture needs a height!"),
                               depth.expect("3D texture needs a height!"),
-                              format, ptype, data as *GLvoid);
+                              format, ptype, data as *const GLvoid);
         } }
     }
 

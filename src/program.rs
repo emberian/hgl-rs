@@ -83,8 +83,8 @@ impl Shader {
         let shader = gl::CreateShader(gltype);
 
         unsafe {
-            gl::ShaderSource(shader, 1 as GLsizei, &(source.as_ptr() as *GLchar) as **GLchar,
-                             &(source.len() as GLint) as *GLint);
+            gl::ShaderSource(shader, 1 as GLsizei, &(source.as_ptr() as *const GLchar) as *const *const GLchar,
+                             &(source.len() as GLint) as *const GLint);
         }
         gl::CompileShader(shader);
 
