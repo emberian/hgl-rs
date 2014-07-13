@@ -1,7 +1,7 @@
 #![crate_type = "rlib"]
 #![crate_type = "lib"]
 
-#![crate_id = "github.com/cmr/hgl-rs#hgl:0.0.1"]
+#![crate_name = "hgl"]
 #![deny(warnings)]
 #![allow(unused_attribute)]
 
