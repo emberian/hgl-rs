@@ -95,7 +95,7 @@ impl Shader {
     }
 
     pub fn from_file(p: &str, type_: ShaderType) -> IoResult<Result<Shader, String>> {
-        match File::open(&Path::new(p)).read_to_str() {
+        match File::open(&Path::new(p)).read_to_string() {
             Err(e) => Err(e),
             Ok(s) => Ok(Shader::compile(s.as_slice(), type_))
         }
