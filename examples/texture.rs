@@ -1,5 +1,3 @@
-#![no_uv]
-
 extern crate glfw;
 extern crate native;
 extern crate hgl;
@@ -35,7 +33,7 @@ void main() {
 }";
 
 #[start]
-fn main(argc: int, argv: **u8) -> int {
+fn main(argc: int, argv: *const *const u8) -> int {
     native::start(argc, argv, proc() {
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
@@ -68,7 +66,7 @@ fn main(argc: int, argv: **u8) -> int {
         let dat = [0.0f32, 0.0, 0.0, 1.0, 1.0, 1.0,
         1.0,    1.0, 1.0, 0.0, 0.0, 0.0];
 
-        let tex = Texture::new(texture::Texture2D, i, dat.as_slice().as_ptr() as *u8);
+        let tex = Texture::new(texture::Texture2D, i, dat.as_slice().as_ptr() as *const u8);
         tex.wrap(texture::Repeat);
         tex.filter(texture::Linear);
 

@@ -1,5 +1,3 @@
-#![no_uv]
-
 extern crate glfw;
 extern crate native;
 extern crate hgl;
@@ -33,7 +31,7 @@ void main() {
 }";
 
 #[start]
-fn main(argc: int, argv: **u8) -> int {
+fn main(argc: int, argv: *const *const u8) -> int {
     native::start(argc, argv, proc() {
         let glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
