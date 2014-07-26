@@ -1,18 +1,12 @@
-language: c
-before_install:
-  - yes | sudo add-apt-repository ppa:cmrx64/cargo
-  - sudo apt-get update
 install:
-  - curl -O http://static.rust-lang.org/dist/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
-  - tar xfz rust-nightly-x86_64-unknown-linux-gnu.tar.gz
-  - (cd rust-nightly-x86_64-unknown-linux-gnu/ && sudo ./install.sh)
-  - sudo apt-get install cargo
-  - bash .install_glfw.sh
+  - curl http://www.rust-lang.org/rustup.sh | sudo sh
+  - sudo bash .install_glfw.sh
 env:
   global:
-    - secure: MNwmpnZcX2uigKGqJll7L2XmZ8u/gwRJyWtCoL1uy3H3lclU9b+62RiyScYjvZ/zN1eZo2fdKwNhTLJ2qP0VX20Vgvup7kqB2cEmF6RflcuTF+kUwjvVsnzoTYKoDFkI0pZtAVCyLnDIyyjKd2SrwrErntw77z4rxwbDd54YN9U=
+    - secure: U2mKX8NXCAwBq4q2EPcuEbhVTrC7qUSufajrKroQ8Z2bMn/el5LAeR0UYdo+W3qwSf93j0W45Fro/Yq+YPqkmbNDnJzCMj1HhiId9N1sqPfUlvZExqyEExYszpd7lK7q1cV5Hy8U5nApvXY9MXtu4w3HASPFw8ub7H7skOZz3P0=
 script:
-  - echo $RUST_PATH
   - cargo build
+  - cargo test
+  - rustdoc -L target/deps src/lib.rs
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
