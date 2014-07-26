@@ -48,5 +48,5 @@ install_glfw()
   clean_tmp_file
 }
 
-
+sudo apt-get update
 install_glfw
