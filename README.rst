@@ -1,6 +1,9 @@
 hgl-rs
 ======
 
+.. warning::
+    ``hgl`` is **deprecated** in favor of gfx-rs_.
+
 .. image:: https://travis-ci.org/cmr/hgl-rs.png?branch=master
            :target: https://travis-ci.org/cmr/hgl-rs
 
@@ -25,3 +28,4 @@ license
 .. _Clarkson: http://clarkson.edu/
 .. _Documentation: http://rust-ci.org/cmr/hgl-rs/doc/hgl/
 .. _rust-ci: http://rust-ci.org/
+.. _gfx-rs: http://github.com/gfx-rs/gfx-rs

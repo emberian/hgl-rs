@@ -7,6 +7,7 @@
 
 #![license = "ASL2/MIT"]
 #![comment = "Helper utilities for working with OpenGL"]
+#![deprecated = "Use gfx-rs instead"]
 
 //! hgl-rs - helpers for working with OpenGL.
 //!
